@@ -9,6 +9,7 @@ declare module 'react-native-image-resizer' {
   export default class ImageResizer {
     static createResizedImage(
       uri: string,
+      customName: string,
       width: number,
       height: number,
       format: 'PNG' | 'JPEG' | 'WEBP',

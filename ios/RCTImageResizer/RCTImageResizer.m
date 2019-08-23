@@ -32,7 +32,7 @@ bool saveImage(NSString * fullPath, UIImage * image, NSString * format, float qu
     return [fileManager createFileAtPath:fullPath contents:data attributes:nil];
 }
 
-NSString * generateFilePath(NSString * ext, NSString * outputPath)
+NSString * generateFilePath(NSString * ext, NSString * outputPath, NSString * customName)
 {
     NSString* directory;
 
@@ -56,10 +56,11 @@ NSString * generateFilePath(NSString * ext, NSString * outputPath)
         }
     }
 
-    NSString* name = [[NSUUID UUID] UUIDString];
+    // NSString* name = [[NSUUID UUID] UUIDString];    
+    NSString* name = customName;
     NSString* fullName = [NSString stringWithFormat:@"%@.%@", name, ext];
     NSString* fullPath = [directory stringByAppendingPathComponent:fullName];
-
+    NSLog(@"Error creating documents subdirectory: %@", fullPath);
     return fullPath;
 }
 
@@ -97,18 +98,19 @@ UIImage * rotateImage(UIImage *inputImage, float rotationDegrees)
 }
 
 RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
+                  customName:(NSString *)customName
                   width:(float)width
                   height:(float)height
                   format:(NSString *)format
-                  quality:(float)quality
+                  quality:(float)quality                  
                   rotation:(float)rotation
-                  outputPath:(NSString *)outputPath
+                  outputPath:(NSString *)outputPath                  
                   callback:(RCTResponseSenderBlock)callback)
 {
     CGSize newSize = CGSizeMake(width, height);
     
     //Set image extension
-    NSString *extension = @"jpg";
+    NSString *extension = @"JPEG";
     if ([format isEqualToString:@"PNG"]) {
         extension = @"png";
     }
@@ -116,7 +118,7 @@ RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
     
     NSString* fullPath;
     @try {
-        fullPath = generateFilePath(extension, outputPath);
+        fullPath = generateFilePath(extension, outputPath, customName);
     } @catch (NSException *exception) {
         callback(@[@"Invalid output path.", @""]);
         return;
@@ -153,7 +155,7 @@ RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
         }
 
         // Compress and save the image
-        if (!saveImage(fullPath, scaledImage, format, quality)) {
+         if (!saveImage(fullPath, scaledImage, format, quality)) {
             callback(@[@"Can't save the image. Check your compression format and your output path", @""]);
             return;
         }
@@ -165,7 +167,7 @@ RCT_EXPORT_METHOD(createResizedImage:(NSString *)path
         NSDictionary *response = @{@"path": fullPath,
                                    @"uri": fileUrl.absoluteString,
                                    @"name": fileName,
-                                   @"size": fileSize == nil ? @(0) : fileSize
+                                //    @"size": fileSize == nil ? @(0) : fileSize
                                    };
         
         callback(@[[NSNull null], response]);
