@@ -35,23 +35,23 @@ class ImageResizerModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void createResizedImage(String imagePath, int newWidth, int newHeight, String compressFormat,
+    public void createResizedImage(String imagePath, String name, int newWidth, int newHeight, String compressFormat,
                             int quality, int rotation, String outputPath, final Callback successCb, final Callback failureCb) {
         try {
-            createResizedImageWithExceptions(imagePath, newWidth, newHeight, compressFormat, quality,
+            createResizedImageWithExceptions(imagePath, name, newWidth, newHeight, compressFormat, quality,
                     rotation, outputPath, successCb, failureCb);
         } catch (IOException e) {
             failureCb.invoke(e.getMessage());
         }
     }
 
-    private void createResizedImageWithExceptions(String imagePath, int newWidth, int newHeight,
+    private void createResizedImageWithExceptions(String imagePath, String name, int newWidth, int newHeight,
                                            String compressFormatString, int quality, int rotation, String outputPath,
                                            final Callback successCb, final Callback failureCb) throws IOException {
         Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.valueOf(compressFormatString);
         Uri imageUri = Uri.parse(imagePath);
 
-        File resizedImage = ImageResizer.createResizedImage(this.context, imageUri, newWidth,
+        File resizedImage = ImageResizer.createResizedImage(this.context, imageUri, name, newWidth,
                 newHeight, compressFormat, quality, rotation, outputPath);
 
         // If resizedImagePath is empty and this wasn't caught earlier, throw.
@@ -60,7 +60,6 @@ class ImageResizerModule extends ReactContextBaseJavaModule {
             response.putString("path", resizedImage.getAbsolutePath());
             response.putString("uri", Uri.fromFile(resizedImage).toString());
             response.putString("name", resizedImage.getName());
-            response.putDouble("size", resizedImage.length());
             // Invoke success
             successCb.invoke(response);
         } else {
