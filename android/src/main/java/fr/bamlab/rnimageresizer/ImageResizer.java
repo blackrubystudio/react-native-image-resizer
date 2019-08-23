@@ -266,7 +266,7 @@ public class ImageResizer {
     /**
      * Create a resized version of the given image.
      */
-    public static File createResizedImage(Context context, Uri imageUri, int newWidth,
+    public static File createResizedImage(Context context, Uri imageUri, String name, int newWidth,
                                             int newHeight, Bitmap.CompressFormat compressFormat,
                                             int quality, int rotation, String outputPath) throws IOException  {
         Bitmap sourceImage = null;
@@ -302,9 +302,9 @@ public class ImageResizer {
         if (outputPath != null) {
             path = new File(outputPath);
         }
-
+        // Long.toString(new Date().getTime())
         File newFile = ImageResizer.saveImage(rotatedImage, path,
-                Long.toString(new Date().getTime()), compressFormat, quality);
+                name, compressFormat, quality);
 
         // Clean up remaining image
         rotatedImage.recycle();
